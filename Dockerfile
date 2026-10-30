@@ -12,7 +12,7 @@ WORKDIR /app
 
 # TODO(step-4b): copy package.json and package-lock.json, then install deps.
 COPY app/package*.json ./
-RUN npm ci --omit=dev
+RUN npm ci --omit=dev && npm update proxy-addr
 
 # TODO(step-4c): copy the rest of the app source into /app.
 COPY app/ ./
@@ -25,6 +25,9 @@ COPY app/ ./
 FROM node:20.11-slim
 
 WORKDIR /app
+
+# Upgrade base packages to apply Debian security patches and remove unused npm
+RUN apt-get update && apt-get upgrade -y && rm -rf /usr/local/lib/node_modules/npm /var/lib/apt/lists/*
 
 # TODO(step-4e): copy the fully-installed app from the builder stage.
 COPY --from=builder /app /app
